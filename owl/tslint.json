@@ -1,0 +1,25 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-airbnb",
+    "tslint-config-prettier"
+  ],
+  "jsRules": {},
+  "rules": {
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "no-else-after-return": false,
+    "no-increment-decrement": false,
+    "whitespace": {
+      "severity": "warning"
+    },
+    "interface-name": false,
+    "max-classes-per-file": [true, 5, "exclude-class-expressions"],
+    "no-namespace": false,
+    "no-console": {
+      "severity": "warning",
+      "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
+    }
+  },
+  "rulesDirectory": []
+}
