@@ -1,22 +1,33 @@
 'use strict';
+var __importStar =
+  (this && this.__importStar) ||
+  function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null)
+      for (var k in mod)
+        if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result['default'] = mod;
+    return result;
+  };
 Object.defineProperty(exports, '__esModule', { value: true });
-var path = require('path');
-var ffi = require('ffi');
-var fs = require('fs');
+const path = __importStar(require('path'));
+const ffi = __importStar(require('ffi'));
+const fs = __importStar(require('fs'));
 // IMPORTANT: choose one
-var RL_LIB = 'libreadline'; // NOTE: libreadline is GPL
+const RL_LIB = 'libreadline'; // NOTE: libreadline is GPL
 // var RL_LIB = "libedit";
-var HISTORY_FILE = path.join(process.env.HOME || '.', '.mal-history');
-var rllib = ffi.Library(RL_LIB, {
+const HISTORY_FILE = path.join(process.env.HOME || '.', '.mal-history');
+const rllib = ffi.Library(RL_LIB, {
   readline: ['string', ['string']],
   add_history: ['int', ['string']],
 });
-var rlHistoryLoaded = false;
+let rlHistoryLoaded = false;
 function readline(prompt) {
   prompt = prompt || 'user> ';
   if (!rlHistoryLoaded) {
     rlHistoryLoaded = true;
-    var lines = [];
+    let lines = [];
     if (fs.existsSync(HISTORY_FILE)) {
       lines = fs
         .readFileSync(HISTORY_FILE)
@@ -25,17 +36,21 @@ function readline(prompt) {
     }
     // Max of 2000 lines
     lines = lines.slice(Math.max(lines.length - 2000, 0));
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       if (lines[i]) {
         rllib.add_history(lines[i]);
       }
     }
   }
-  var line = rllib.readline(prompt);
+  const line = rllib.readline(prompt);
   if (line) {
     rllib.add_history(line);
     try {
-      fs.appendFileSync(HISTORY_FILE, line + '\n');
+      fs.appendFileSync(
+        HISTORY_FILE,
+        `${line}
+`,
+      );
     } catch (exc) {
       // ignored
     }
