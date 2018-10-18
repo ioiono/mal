@@ -22,7 +22,14 @@ while (true) {
   }
   try {
     console.log(rep(line));
-  } catch (e) {
-    console.error(e.message);
+  } catch (exc) {
+    if (exc instanceof reader_1.BlankException) {
+      continue;
+    }
+    if (exc.stack) {
+      console.log(exc.stack);
+    } else {
+      console.log(`Error: ${exc}`);
+    }
   }
 }

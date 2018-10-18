@@ -1,6 +1,8 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
 const types_1 = require('./types');
+class BlankException extends Error {}
+exports.BlankException = BlankException;
 /**
  *  This object will store the tokens and a position.
  *  The Reader object will have two methods: next and peek.
@@ -88,6 +90,7 @@ const readForm = reader => {
  * @param input: string
  */
 const tokenizer = input => {
+  if (!input || input[0] === ';') return [];
   const re = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/g;
   const tokens = [];
   while (true) {
@@ -98,6 +101,7 @@ const tokenizer = input => {
       break;
     }
     if (match[0] !== ';') {
+      // Ignore comments.
       tokens.push(match);
     }
   }
@@ -109,6 +113,9 @@ const tokenizer = input => {
  */
 function readStr(input) {
   const tokens = tokenizer(input);
+  if (tokens.length === 0) {
+    throw new BlankException();
+  }
   const reader = new Reader(tokens);
   return readForm(reader);
 }

@@ -10,7 +10,6 @@ const EVAL = (ast: any, _env?: any): any => ast;
 const PRINT = (exp: any): string => exp;
 
 const rep = (str: string): string => PRINT(EVAL(READ(str)));
-
 while (true) {
   const line = readline('user> ');
   if (!line) break;

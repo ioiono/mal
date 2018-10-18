@@ -9,6 +9,8 @@ import {
   OwlVector,
 } from './types';
 
+export class BlankException extends Error {}
+
 /**
  *  This object will store the tokens and a position.
  *  The Reader object will have two methods: next and peek.
@@ -38,7 +40,6 @@ class Reader {
  */
 const readAtom = (reader: Reader): OwlType => {
   const token: string = reader.next();
-
   if (/^-?[0-9]+$/.test(token)) {
     return new OwlNumber(Number.parseInt(token, 10));
   }
@@ -103,6 +104,7 @@ const readForm = (reader: Reader): OwlType => {
  * @param input: string
  */
 const tokenizer = (input: string): string[] => {
+  if (!input || input[0] === ';') return [];
   const re = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/g;
   const tokens: string[] = [];
   while (true) {
@@ -113,6 +115,7 @@ const tokenizer = (input: string): string[] => {
       break;
     }
     if (match[0] !== ';') {
+      // Ignore comments.
       tokens.push(match);
     }
   }
@@ -126,6 +129,10 @@ const tokenizer = (input: string): string[] => {
  */
 export function readStr(input: string): OwlType {
   const tokens = tokenizer(input);
+  if (tokens.length === 0) {
+    throw new BlankException();
+  }
+
   const reader = new Reader(tokens);
   return readForm(reader);
 }
