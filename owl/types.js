@@ -58,3 +58,21 @@ class OwlKeyword {
   }
 }
 exports.OwlKeyword = OwlKeyword;
+class OwlHashMap {
+  constructor(list) {
+    this.list = list;
+    this.type = 9 /* HashMap */;
+    this.map = new Map();
+    if (list.length % 2 !== 0) {
+      throw new Error('Odd number of hash map arguments');
+    }
+    for (let i = 0; i < list.length; i += 2) {
+      const k = list[i];
+      const v = list[i + 1];
+      if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */)
+        throw new Error(`expected hash-map key string, got: ${k.type}`);
+      this.map.set(k, v);
+    }
+  }
+}
+exports.OwlHashMap = OwlHashMap;

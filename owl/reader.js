@@ -30,18 +30,25 @@ class Reader {
  */
 const readAtom = reader => {
   const token = reader.next();
+  // int
   if (/^-?[0-9]+$/.test(token)) {
     return new types_1.OwlNumber(Number.parseInt(token, 10));
   }
+  // float
   if (/^-?[0-9]\.[0-9]+$/.test(token)) {
     return new types_1.OwlNumber(Number.parseFloat(token));
   }
+  // string
   if (token[0] === '"') {
     return new types_1.OwlString(
       token
         .slice(1, token.length - 1)
         .replace(/\\(.)/g, (_, c) => (c === 'n' ? '\n' : c)),
     );
+  }
+  // keyword
+  if (token[0] === ':') {
+    return new types_1.OwlKeyword(token.substr(1));
   }
   switch (token) {
     case 'nil':
@@ -62,10 +69,56 @@ const readAtom = reader => {
 const readForm = reader => {
   const token = reader.peek();
   switch (token) {
+    case "'":
+      reader.next();
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('quote'),
+        readForm(reader),
+      ]);
+    case '`':
+      reader.next();
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('quasiquote'),
+        readForm(reader),
+      ]);
+    case '~':
+      reader.next();
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('unquote'),
+        readForm(reader),
+      ]);
+    case '~@':
+      reader.next();
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('splice-unquote'),
+        readForm(reader),
+      ]);
+    case '@':
+      reader.next();
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('deref'),
+        readForm(reader),
+      ]);
+    case '^':
+      reader.next();
+      const meta = readForm(reader);
+      return new types_1.OwlList([
+        new types_1.OwlSymbol('with-meta'),
+        readForm(reader),
+        meta,
+      ]);
+    // case '^':
+    //   reader.next();
+    //   return new OwlList([new OwlSymbol('with-meta'), readForm(reader)]);
+    // case '^': reader.next()
+    //               var meta = read_form(reader)
+    //               return [Symbol.for('with-meta'), read_form(reader), meta]
     case '(':
       return readList(reader);
     case '[':
       return readVector(reader);
+    case '{':
+      return readHashMap(reader);
     default:
       return readAtom(reader);
   }
@@ -139,3 +192,4 @@ const readParen = (constructor, open, close) => {
 };
 const readList = readParen(types_1.OwlList, '(', ')');
 const readVector = readParen(types_1.OwlVector, '[', ']');
+const readHashMap = readParen(types_1.OwlHashMap, '{', '}');

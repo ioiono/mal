@@ -24,6 +24,19 @@ exports.prStr = (val, printReadably = true) => {
     case 7 /* Symbol */:
       return `${Symbol.keyFor(val.val)}`;
     case 8 /* Keyword */:
-      return `:${val.val}`;
+      return `:${val.val.substr(1)}`;
+    case 9 /* HashMap */:
+      let result = '{';
+      for (const [key, value] of val.map) {
+        if (result !== '{') {
+          result += ' ';
+        }
+        result += `${exports.prStr(key, printReadably)} ${exports.prStr(
+          value,
+          printReadably,
+        )}`;
+      }
+      result += '}';
+      return result;
   }
 };

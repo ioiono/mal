@@ -20,6 +20,16 @@ export const prStr = (val: OwlType, printReadably: boolean = true): string => {
     case Types.Symbol:
       return `${Symbol.keyFor(val.val)}`;
     case Types.Keyword:
-      return `:${val.val}`;
+      return `:${val.val.substr(1)}`;
+    case Types.HashMap:
+      let result = '{';
+      for (const [key, value] of val.map) {
+        if (result !== '{') {
+          result += ' ';
+        }
+        result += `${prStr(key, printReadably)} ${prStr(value, printReadably)}`;
+      }
+      result += '}';
+      return result;
   }
 };

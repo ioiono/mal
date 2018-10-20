@@ -6,7 +6,8 @@ export type OwlType =
   | OwlBoolean
   | OwlNil
   | OwlSymbol
-  | OwlKeyword;
+  | OwlKeyword
+  | OwlHashMap;
 
 export const enum Types {
   List = 1,
@@ -17,6 +18,7 @@ export const enum Types {
   Nil,
   Symbol,
   Keyword,
+  HashMap,
 }
 
 export class OwlList {
@@ -69,5 +71,23 @@ export class OwlKeyword {
 
   constructor(public val: string) {
     this.val = String.fromCharCode(0x29e) + this.val;
+  }
+}
+
+export class OwlHashMap {
+  public type: Types.HashMap = Types.HashMap;
+  public map = new Map<OwlType, OwlType>();
+
+  constructor(public list: OwlType[]) {
+    if (list.length % 2 !== 0) {
+      throw new Error('Odd number of hash map arguments');
+    }
+    for (let i = 0; i < list.length; i += 2) {
+      const k = list[i];
+      const v = list[i + 1];
+      if (k.type !== Types.String && k.type !== Types.Keyword)
+        throw new Error(`expected hash-map key string, got: ${k.type}`);
+      this.map.set(k, v);
+    }
   }
 }
