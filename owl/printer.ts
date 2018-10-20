@@ -1,38 +1,25 @@
-import {
-  OwlBoolean,
-  OwlList,
-  OwlNumber,
-  OwlString,
-  OwlSymbol,
-  OwlType,
-  OwlVector,
-  Types,
-} from './types';
+import { OwlType, Types } from './types';
 
-export const prStr = (val: OwlType): string => {
+export const prStr = (val: OwlType, printReadably: boolean = true): string => {
   switch (val.type) {
     case Types.List:
-      return `(${val instanceof OwlList ? val.list.map(prStr).join(' ') : ''})`;
+      return `(${val.list.map(v => prStr(v, printReadably)).join(' ')})`;
     case Types.Vector:
-      return `[${
-        val instanceof OwlVector ? val.list.map(prStr).join(' ') : ''
-      }]`;
+      return `[${val.list.map(v => prStr(v, printReadably)).join(' ')}]`;
     case Types.Number:
-      return val instanceof OwlNumber ? `${val.val}` : '';
+      return `${val.val}`;
     case Types.String:
-      return `"${
-        val instanceof OwlString
-          ? val.val
-              .replace(/\\/g, '\\\\')
-              .replace(/"/g, '\\"')
-              .replace(/\n/g, '\\n')
-          : ''
-      }"`;
+      return `"${val.val
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')}"`;
     case Types.Boolean:
-      return `${val instanceof OwlBoolean ? val.val : ''}`;
+      return `${val.val}`;
     case Types.Nil:
       return 'nil';
     case Types.Symbol:
-      return `${val instanceof OwlSymbol ? Symbol.keyFor(val.val) : ''}`;
+      return `${Symbol.keyFor(val.val)}`;
+    case Types.Keyword:
+      return `:${val.val}`;
   }
 };

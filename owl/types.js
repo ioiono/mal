@@ -50,3 +50,11 @@ class OwlSymbol {
   }
 }
 exports.OwlSymbol = OwlSymbol;
+class OwlKeyword {
+  constructor(val) {
+    this.val = val;
+    this.type = 8 /* Keyword */;
+    this.val = String.fromCharCode(0x29e) + this.val;
+  }
+}
+exports.OwlKeyword = OwlKeyword;
