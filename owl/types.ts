@@ -7,7 +7,8 @@ export type OwlType =
   | OwlNil
   | OwlSymbol
   | OwlKeyword
-  | OwlHashMap;
+  | OwlHashMap
+  | OwlFunction;
 
 export const enum Types {
   List = 1,
@@ -19,6 +20,7 @@ export const enum Types {
   Symbol,
   Keyword,
   HashMap,
+  Function,
 }
 
 export class OwlList {
@@ -90,4 +92,10 @@ export class OwlHashMap {
       this.map.set(k, v);
     }
   }
+}
+
+export class OwlFunction {
+  public type: Types.Function = Types.Function;
+
+  constructor(public func: (...args: any[]) => OwlType) {}
 }

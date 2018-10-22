@@ -31,5 +31,7 @@ export const prStr = (val: OwlType, printReadably: boolean = true): string => {
       }
       result += '}';
       return result;
+    case Types.Function:
+      throw new Error(`invalid state`);
   }
 };

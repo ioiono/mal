@@ -38,5 +38,7 @@ exports.prStr = (val, printReadably = true) => {
       }
       result += '}';
       return result;
+    case 10 /* Function */:
+      throw new Error(`invalid state`);
   }
 };

@@ -10,6 +10,7 @@
     "arrow-parens": [true, "ban-single-arg-parens"],
     "no-else-after-return": false,
     "no-increment-decrement": false,
+    "prefer-array-literal": false,
     "whitespace": {
       "severity": "warning"
     },

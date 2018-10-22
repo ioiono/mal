@@ -76,3 +76,10 @@ class OwlHashMap {
   }
 }
 exports.OwlHashMap = OwlHashMap;
+class OwlFunction {
+  constructor(func) {
+    this.func = func;
+    this.type = 10 /* Function */;
+  }
+}
+exports.OwlFunction = OwlFunction;

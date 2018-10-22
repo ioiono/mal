@@ -17,7 +17,8 @@
   },
   "scripts": {
     "test:step0": "cd .. && make 'test^owl^step0'",
-    "test:step1": "cd .. && make 'test^owl^step1'"
+    "test:step1": "cd .. && make 'test^owl^step1'",
+    "test:step2": "cd .. && make 'test^owl^step2'"
   },
   "husky": {
     "hooks": {

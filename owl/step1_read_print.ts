@@ -1,6 +1,6 @@
 import { readline } from './node_readline';
 import { prStr } from './printer';
-import { readStr, BlankException } from './reader';
+import { BlankException, readStr } from './reader';
 import { OwlType } from './types';
 
 // READ
