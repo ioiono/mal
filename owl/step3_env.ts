@@ -1,3 +1,4 @@
+import { Env } from './env';
 import { readline } from './node_readline';
 import { prStr } from './printer';
 import { BlankException, readStr } from './reader';
@@ -6,14 +7,11 @@ import {
   OwlHashMap,
   OwlList,
   OwlNumber,
+  OwlSymbol,
   OwlType,
   OwlVector,
   Types,
 } from './types';
-
-interface OwlEnvironment {
-  [key: string]: OwlFunction;
-}
 
 // READ
 const READ = (str: string): OwlType => {
@@ -21,21 +19,64 @@ const READ = (str: string): OwlType => {
 };
 
 // EVAL
-const EVAL = (ast: OwlType, env: OwlEnvironment): OwlType => {
-  if (ast.type === Types.List) {
-    if (ast.list.length === 0) {
-      return ast;
-    } else {
-      const res = evalAST(ast, env) as OwlList;
-      const [first, ...rest] = res.list;
-      if (first.type !== Types.Function) {
-        throw new Error(`unexpected token: ${first.type}, expected: function`);
-      }
-      return first.func(...rest);
-    }
-  } else {
+const EVAL = (ast: OwlType, env: Env): OwlType => {
+  if (ast.type !== Types.List) {
     return evalAST(ast, env);
   }
+  if (ast.list.length === 0) {
+    return ast;
+  }
+
+  const first = ast.list[0];
+
+  switch (first.type) {
+    case Types.Symbol:
+      switch (Symbol.keyFor(first.val)) {
+        case 'def!': {
+          const [, key, value] = ast.list;
+          if (key.type !== Types.Symbol) {
+            throw new Error(
+              `unexpected toke type: ${key.type}, expected: symbol`,
+            );
+          }
+          if (!value) {
+            throw new Error(`unexpected syntax`);
+          }
+          return env.set(key, EVAL(value, env));
+        }
+        case 'let*': {
+          const letEnv = new Env(env);
+          const pairs = ast.list[1];
+          if (pairs.type !== Types.List && pairs.type !== Types.Vector) {
+            throw new Error(
+              `unexpected toke type: ${pairs.type}, expected: list or vector`,
+            );
+          }
+          const list = pairs.list;
+          for (let i = 0; i < list.length; i += 2) {
+            const k = list[i];
+            const v = list[i + 1];
+
+            if (!k || !v) {
+              throw new Error(`syntax error`);
+            }
+            if (k.type !== Types.Symbol) {
+              throw new Error(
+                `unexpected token type: ${k.type}, expected: symbol`,
+              );
+            }
+            letEnv.set(k, EVAL(v, letEnv));
+          }
+          return EVAL(ast.list[2], letEnv);
+        }
+      }
+  }
+  const res = evalAST(ast, env) as OwlList;
+  const [fn, ...args] = res.list;
+  if (fn.type !== Types.Function) {
+    throw new Error(`unexpected token: ${fn.type}, expected: function`);
+  }
+  return fn.func(...args);
 };
 /**
  * function eval_ast which takes ast (owl data type) and an associative structure (the environment from above).
@@ -47,12 +88,12 @@ const EVAL = (ast: OwlType, env: OwlEnvironment): OwlType => {
  * @param ast owl data type
  * @param env the associative structure
  */
-const evalAST = (ast: OwlType, env: OwlEnvironment): OwlType => {
+const evalAST = (ast: OwlType, env: Env): OwlType => {
   switch (ast.type) {
     case Types.Symbol:
-      const find = replEnv[Symbol.keyFor(ast.val)!];
+      const find = env.get(ast);
       if (!find) {
-        throw new Error(`unknown symbol: ${ast.type}`);
+        throw new Error(`unknown symbol: ${Symbol.keyFor(ast.val)}`);
       }
       return find;
     case Types.List:
@@ -75,25 +116,36 @@ const evalAST = (ast: OwlType, env: OwlEnvironment): OwlType => {
 // PRINT
 const PRINT = prStr;
 // noinspection TsLint
-const replEnv: OwlEnvironment = {
-  '+': new OwlFunction(
+const replEnv = new Env();
+replEnv.set(
+  new OwlSymbol('+'),
+  new OwlFunction(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val + b!.val),
   ),
-  '-': new OwlFunction(
+);
+replEnv.set(
+  new OwlSymbol('-'),
+  new OwlFunction(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val - b!.val),
   ),
-  '*': new OwlFunction(
+);
+replEnv.set(
+  new OwlSymbol('*'),
+  new OwlFunction(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val * b!.val),
   ),
-  '/': new OwlFunction(
+);
+replEnv.set(
+  new OwlSymbol('/'),
+  new OwlFunction(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val / b!.val),
   ),
-};
+);
 
 const rep = (str: string): string => PRINT(EVAL(READ(str), replEnv));
 while (true) {
   const line = readline('user> ');
-  if (line == null || line === '(owl-bye)') {
+  if (line == null || line === '(exit)') {
     break;
   }
   if (line === '') {

@@ -40,7 +40,7 @@ const evalAST = (ast, env) => {
     case 7 /* Symbol */:
       const find = replEnv[Symbol.keyFor(ast.val)];
       if (!find) {
-        throw new Error(`unknown symbol: ${ast.type}`);
+        throw new Error(`unknown symbol: ${Symbol.keyFor(ast.val)}`);
       }
       return find;
     case 1 /* List */:

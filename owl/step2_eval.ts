@@ -52,7 +52,7 @@ const evalAST = (ast: OwlType, env: OwlEnvironment): OwlType => {
     case Types.Symbol:
       const find = replEnv[Symbol.keyFor(ast.val)!];
       if (!find) {
-        throw new Error(`unknown symbol: ${ast.type}`);
+        throw new Error(`unknown symbol: ${Symbol.keyFor(ast.val)}`);
       }
       return find;
     case Types.List:
