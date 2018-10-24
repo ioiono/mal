@@ -11,6 +11,7 @@ const READ = str => {
 };
 // EVAL
 const EVAL = (ast, env) => {
+  if (!ast) throw new Error('invalid syntax');
   if (ast.type !== 1 /* List */) {
     return evalAST(ast, env);
   }
@@ -43,17 +44,17 @@ const EVAL = (ast, env) => {
           }
           const list = pairs.list;
           for (let i = 0; i < list.length; i += 2) {
-            const k = list[i];
-            const v = list[i + 1];
-            if (!k || !v) {
+            const key = list[i];
+            const value = list[i + 1];
+            if (!key || !value) {
               throw new Error(`syntax error`);
             }
-            if (k.type !== 7 /* Symbol */) {
+            if (key.type !== 7 /* Symbol */) {
               throw new Error(
-                `unexpected token type: ${k.type}, expected: symbol`,
+                `unexpected token type: ${key.type}, expected: symbol`,
               );
             }
-            letEnv.set(k, EVAL(v, letEnv));
+            letEnv.set(key, EVAL(value, letEnv));
           }
           return EVAL(ast.list[2], letEnv);
         }

@@ -20,6 +20,7 @@ const READ = (str: string): OwlType => {
 
 // EVAL
 const EVAL = (ast: OwlType, env: Env): OwlType => {
+  if (!ast) throw new Error('invalid syntax');
   if (ast.type !== Types.List) {
     return evalAST(ast, env);
   }
@@ -53,20 +54,22 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
             );
           }
           const list = pairs.list;
-          for (let i = 0; i < list.length; i += 2) {
-            const k = list[i];
-            const v = list[i + 1];
 
-            if (!k || !v) {
+          for (let i = 0; i < list.length; i += 2) {
+            const key = list[i];
+            const value = list[i + 1];
+
+            if (!key || !value) {
               throw new Error(`syntax error`);
             }
-            if (k.type !== Types.Symbol) {
+            if (key.type !== Types.Symbol) {
               throw new Error(
-                `unexpected token type: ${k.type}, expected: symbol`,
+                `unexpected token type: ${key.type}, expected: symbol`,
               );
             }
-            letEnv.set(k, EVAL(v, letEnv));
+            letEnv.set(key, EVAL(value, letEnv));
           }
+
           return EVAL(ast.list[2], letEnv);
         }
       }
@@ -143,6 +146,7 @@ replEnv.set(
 );
 
 const rep = (str: string): string => PRINT(EVAL(READ(str), replEnv));
+
 while (true) {
   const line = readline('user> ');
   if (line == null || line === '(exit)') {
