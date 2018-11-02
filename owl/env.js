@@ -1,9 +1,18 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
+const types_1 = require('./types');
 class Env {
-  constructor(outer) {
+  constructor(outer, binds = [], exprs = []) {
     this.outer = outer;
     this.data = new Map();
+    for (let i = 0; i < binds.length; i++) {
+      const sym = binds[i];
+      if (Symbol.keyFor(sym.val) === '&') {
+        this.set(sym, new types_1.OwlList(exprs.slice(i)));
+        break;
+      }
+      this.set(sym, exprs[i]);
+    }
   }
   set(key, value) {
     // use OwlSymbol.val as [key] for map instead of key itself!

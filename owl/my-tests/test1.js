@@ -2,9 +2,16 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 const printer_1 = require('../printer');
 const reader_1 = require('../reader');
+const types_1 = require('../types');
 // const str: string = '{"abc" 1}';
 const str = '(+  1)';
 // const str: string = '^{"a" 1} [1 2 3]';
 // console.log(prStr(readStr("(+    1 2 )")));
 // console.log(readStr("(+    1 2 )"));
 console.log(printer_1.prStr(reader_1.readStr(str)));
+console.log(JSON.stringify(new types_1.OwlNumber(233)));
+console.log(new types_1.OwlNumber(233));
+console.log(JSON.stringify(new types_1.OwlSymbol('let*')));
+console.log(new types_1.OwlSymbol('let*'));
+console.log(JSON.stringify(new types_1.OwlList([])));
+console.log(new types_1.OwlList([]));

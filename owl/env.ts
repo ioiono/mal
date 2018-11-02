@@ -1,10 +1,24 @@
-import { OwlSymbol, OwlType } from './types';
+import { OwlList, OwlSymbol, OwlType } from './types';
+import { MalList } from '../ts/types';
 
 export class Env {
   public data: Map<symbol, OwlType>;
 
-  constructor(public outer?: Env) {
+  constructor(
+    public outer?: Env,
+    binds: OwlSymbol[] = [],
+    exprs: OwlType[] = [],
+  ) {
     this.data = new Map();
+
+    for (let i = 0; i < binds.length; i++) {
+      const sym = binds[i];
+      if (Symbol.keyFor(sym.val) === '&') {
+        this.set(sym, new OwlList(exprs.slice(i)));
+        break;
+      }
+      this.set(sym, exprs[i]);
+    }
   }
 
   public set(key: OwlSymbol, value: OwlType): OwlType {
