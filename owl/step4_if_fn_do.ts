@@ -9,12 +9,11 @@ import {
   OwlHashMap,
   OwlList,
   OwlNil,
-  OwlNumber,
-  OwlSymbol,
   OwlType,
   OwlVector,
   Types,
 } from './types';
+
 // READ
 const READ = (str: string): OwlType => {
   return readStr(str);

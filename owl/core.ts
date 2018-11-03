@@ -1,3 +1,4 @@
+import { prStr } from './printer';
 import {
   equals,
   isListOrVector,
@@ -11,7 +12,6 @@ import {
   OwlType,
   Types,
 } from './types';
-import { prStr } from './printer';
 
 export const ns: Map<OwlSymbol, OwlFunction> = (() => {
   const funcs: { [symbol: string]: typeof OwlFunction.prototype.func } = {
