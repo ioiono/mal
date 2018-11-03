@@ -15,7 +15,7 @@ import { prStr } from './printer';
 
 export const ns: Map<OwlSymbol, OwlFunction> = (() => {
   const funcs: { [symbol: string]: typeof OwlFunction.prototype.func } = {
-    '+'(a: OwlType, b: OwlType): OwlNumber {
+    '+': (a: OwlType, b: OwlType): OwlNumber => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -24,7 +24,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlNumber(a.val + b.val);
     },
-    '-'(a: OwlType, b: OwlType): OwlNumber {
+    '-': (a: OwlType, b: OwlType): OwlNumber => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -33,7 +33,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlNumber(a.val - b.val);
     },
-    '*'(a: OwlType, b: OwlType): OwlNumber {
+    '*': (a: OwlType, b: OwlType): OwlNumber => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -42,7 +42,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlNumber(a.val * b.val);
     },
-    '/'(a: OwlType, b: OwlType): OwlNumber {
+    '/': (a: OwlType, b: OwlType): OwlNumber => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -51,26 +51,21 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlNumber(a.val / b.val);
     },
-    list(...args: OwlType[]): OwlList {
-      return new OwlList(args);
-    },
-    'list?'(arg: OwlType): OwlBoolean {
-      return new OwlBoolean(arg.type === Types.List);
-    },
-    'empty?'(arg: OwlType): OwlBoolean {
+    list: (...args: OwlType[]): OwlList => new OwlList(args),
+    'list?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.List),
+    'empty?': (arg: OwlType): OwlBoolean => {
       if (!isListOrVector(arg)) return new OwlBoolean(false);
       return new OwlBoolean(arg.list.length === 0);
     },
-    count(arg: OwlType): OwlNumber {
+    count: (arg: OwlType): OwlNumber => {
       if (!isListOrVector(arg)) {
         return new OwlNumber(0);
       }
       return new OwlNumber(arg.list.length);
     },
-    '='(a: OwlType, b: OwlType): OwlBoolean {
-      return new OwlBoolean(equals(a, b));
-    },
-    '<'(a: OwlType, b: OwlType): OwlBoolean {
+    '=': (a: OwlType, b: OwlType): OwlBoolean => new OwlBoolean(equals(a, b)),
+    '<': (a: OwlType, b: OwlType): OwlBoolean => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -79,7 +74,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlBoolean(a.val < b.val);
     },
-    '<='(a: OwlType, b: OwlType): OwlBoolean {
+    '<=': (a: OwlType, b: OwlType): OwlBoolean => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -88,7 +83,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlBoolean(a.val <= b.val);
     },
-    '>'(a: OwlType, b: OwlType): OwlBoolean {
+    '>': (a: OwlType, b: OwlType): OwlBoolean => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -97,7 +92,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlBoolean(a.val > b.val);
     },
-    '>='(a: OwlType, b: OwlType): OwlBoolean {
+    '>=': (a: OwlType, b: OwlType): OwlBoolean => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }

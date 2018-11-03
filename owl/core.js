@@ -4,7 +4,7 @@ const types_1 = require('./types');
 const printer_1 = require('./printer');
 exports.ns = (() => {
   const funcs = {
-    '+'(a, b) {
+    '+': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -13,7 +13,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlNumber(a.val + b.val);
     },
-    '-'(a, b) {
+    '-': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -22,7 +22,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlNumber(a.val - b.val);
     },
-    '*'(a, b) {
+    '*': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -31,7 +31,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlNumber(a.val * b.val);
     },
-    '/'(a, b) {
+    '/': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -40,26 +40,20 @@ exports.ns = (() => {
       }
       return new types_1.OwlNumber(a.val / b.val);
     },
-    list(...args) {
-      return new types_1.OwlList(args);
-    },
-    'list?'(arg) {
-      return new types_1.OwlBoolean(arg.type === 1 /* List */);
-    },
-    'empty?'(arg) {
+    list: (...args) => new types_1.OwlList(args),
+    'list?': arg => new types_1.OwlBoolean(arg.type === 1 /* List */),
+    'empty?': arg => {
       if (!types_1.isListOrVector(arg)) return new types_1.OwlBoolean(false);
       return new types_1.OwlBoolean(arg.list.length === 0);
     },
-    count(arg) {
+    count: arg => {
       if (!types_1.isListOrVector(arg)) {
         return new types_1.OwlNumber(0);
       }
       return new types_1.OwlNumber(arg.list.length);
     },
-    '='(a, b) {
-      return new types_1.OwlBoolean(types_1.equals(a, b));
-    },
-    '<'(a, b) {
+    '=': (a, b) => new types_1.OwlBoolean(types_1.equals(a, b)),
+    '<': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -68,7 +62,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlBoolean(a.val < b.val);
     },
-    '<='(a, b) {
+    '<=': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -77,7 +71,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlBoolean(a.val <= b.val);
     },
-    '>'(a, b) {
+    '>': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
@@ -86,7 +80,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlBoolean(a.val > b.val);
     },
-    '>='(a, b) {
+    '>=': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
       }
