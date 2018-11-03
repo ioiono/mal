@@ -98,7 +98,7 @@ const EVAL = (ast, env) => {
         }
         case 'fn*': {
           const [, sec, binds] = ast.list;
-          if (sec.type !== 1 /* List */ && sec.type !== 2 /* Vector */) {
+          if (!types_1.isListOrVector(sec)) {
             throw new Error(
               `unexpected return type: ${sec.type}, expected: list or vector`,
             );
@@ -161,34 +161,11 @@ const evalAST = (ast, env) => {
 const PRINT = printer_1.prStr;
 // noinspection TsLint
 const replEnv = new env_1.Env();
-// replEnv.set(
-//   new OwlSymbol('+'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val + b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('-'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val - b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('*'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val * b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('/'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val / b!.val),
-//   ),
-// );
 const rep = str => PRINT(EVAL(READ(str), replEnv));
 core.ns.forEach((v, k) => {
   replEnv.set(k, v);
 });
+rep('(def! not (fn* (a) (if a false true)))');
 while (true) {
   const line = node_readline_1.readline('user> ');
   if (line == null || line === '(exit)') {

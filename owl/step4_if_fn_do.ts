@@ -4,6 +4,7 @@ import { readline } from './node_readline';
 import { prStr } from './printer';
 import { BlankException, readStr } from './reader';
 import {
+  isListOrVector,
   OwlFunction,
   OwlHashMap,
   OwlList,
@@ -102,7 +103,7 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
         case 'fn*': {
           const [, sec, binds] = ast.list;
 
-          if (sec.type !== Types.List && sec.type !== Types.Vector) {
+          if (!isListOrVector(sec)) {
             throw new Error(
               `unexpected return type: ${sec.type}, expected: list or vector`,
             );
@@ -170,36 +171,13 @@ const PRINT = prStr;
 // noinspection TsLint
 const replEnv = new Env();
 
-// replEnv.set(
-//   new OwlSymbol('+'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val + b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('-'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val - b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('*'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val * b!.val),
-//   ),
-// );
-// replEnv.set(
-//   new OwlSymbol('/'),
-//   new OwlFunction(
-//     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val / b!.val),
-//   ),
-// );
-
 const rep = (str: string): string => PRINT(EVAL(READ(str), replEnv));
 
 core.ns.forEach((v, k) => {
   replEnv.set(k, v);
 });
+
+rep('(def! not (fn* (a) (if a false true)))');
 
 while (true) {
   const line = readline('user> ');

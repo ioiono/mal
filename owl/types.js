@@ -1,5 +1,65 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
+exports.isListOrVector = arg =>
+  arg.type === 1 /* List */ || arg.type === 2 /* Vector */;
+exports.equals = (a, b) => {
+  // same object
+  if (a === b) return true;
+  if (a.type !== b.type) return false;
+  // Nil
+  if (a.type === 6 /* Nil */ && b.type === 6 /* Nil */) {
+    return true;
+  }
+  // List and Vector
+  if (exports.isListOrVector(a) && exports.isListOrVector(b)) {
+    if (a.list.length !== b.list.length) {
+      return false;
+    }
+    for (let i = 0; i < a.list.length; i++) {
+      if (!exports.equals(a.list[i], b.list[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // Map
+  if (a.type === 9 /* HashMap */ && b.type === 9 /* HashMap */) {
+    if (a.map.size !== b.map.size) {
+      return false;
+    }
+    if (Object.keys(a.map).length !== Object.keys(b.map).length) {
+      return false;
+    }
+    for (const [k, v] of a.map.entries()) {
+      if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */) {
+        throw new Error(
+          `unexpected symbol: ${k.type}, expected: string or keyword`,
+        );
+      }
+      const bV = b.map.get(k);
+      if (bV === undefined) return false;
+      if (!exports.equals(v, bV)) return false;
+    }
+  }
+  //  Symbol
+  if (a.type === 7 /* Symbol */ && b.type === 7 /* Symbol */) {
+    return Symbol.keyFor(a.val) === Symbol.keyFor(b.val);
+  }
+  //  Number
+  //  String
+  //  Boolean
+  //  Keyword
+  if (
+    (a.type === 3 /* Number */ && b.type === 3) /* Number */ ||
+    (a.type === 4 /* String */ && b.type === 4) /* String */ ||
+    (a.type === 5 /* Boolean */ && b.type === 5) /* Boolean */ ||
+    (a.type === 8 /* Keyword */ && b.type === 8) /* Keyword */
+  ) {
+    return a.val === b.val;
+  }
+  //  Function,
+  return false;
+};
 class OwlList {
   constructor(list) {
     this.list = list;

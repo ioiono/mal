@@ -8,7 +8,7 @@ class Env {
     for (let i = 0; i < binds.length; i++) {
       const sym = binds[i];
       if (Symbol.keyFor(sym.val) === '&') {
-        this.set(sym, new types_1.OwlList(exprs.slice(i)));
+        this.set(binds[i + 1], new types_1.OwlList(exprs.slice(i)));
         break;
       }
       this.set(sym, exprs[i]);
