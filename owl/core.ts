@@ -106,20 +106,20 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlBoolean(a.val >= b.val);
     },
-    'pr-str'(...args: OwlType[]): OwlString {
-      return new OwlString(args.map(el => prStr(el, true)).join(' '));
-    },
-    prn(...args: OwlType[]): OwlNil {
+    'pr-str': (...args: OwlType[]): OwlString =>
+      new OwlString(args.map(el => prStr(el, true)).join(' ')),
+    prn: (...args: OwlType[]): OwlNil => {
       console.log(args.map(el => prStr(el, true)).join(' '));
       return new OwlNil();
     },
-    str(...args: OwlType[]): OwlString {
-      return new OwlString(args.map(el => prStr(el, false)).join(''));
-    },
-    println(...args: OwlType[]): OwlNil {
+    str: (...args: OwlType[]): OwlString =>
+      new OwlString(args.map(el => prStr(el, false)).join('')),
+    println: (...args: OwlType[]): OwlNil => {
       console.log(args.map(el => prStr(el, false)).join(' '));
       return new OwlNil();
     },
+    add: (...args: OwlNumber[]): OwlNumber =>
+      args.reduce((a, b) => new OwlNumber(a.val + b.val), new OwlNumber(0)),
   };
   const map = new Map<OwlSymbol, OwlFunction>();
   Object.keys(funcs).map(key =>

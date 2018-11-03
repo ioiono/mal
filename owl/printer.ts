@@ -9,10 +9,15 @@ export const prStr = (val: OwlType, printReadably: boolean = true): string => {
     case Types.Number:
       return `${val.val}`;
     case Types.String:
-      return `"${val.val
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n')}"`;
+      if (printReadably) {
+        const str = val.val
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n');
+        return `"${str}"`;
+      } else {
+        return val.val;
+      }
     case Types.Boolean:
       return `${val.val}`;
     case Types.Nil:

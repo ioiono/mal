@@ -95,24 +95,27 @@ exports.ns = (() => {
       }
       return new types_1.OwlBoolean(a.val >= b.val);
     },
-    'pr-str'(...args) {
-      return new types_1.OwlString(
+    'pr-str': (...args) =>
+      new types_1.OwlString(
         args.map(el => printer_1.prStr(el, true)).join(' '),
-      );
-    },
-    prn(...args) {
+      ),
+    prn: (...args) => {
       console.log(args.map(el => printer_1.prStr(el, true)).join(' '));
       return new types_1.OwlNil();
     },
-    str(...args) {
-      return new types_1.OwlString(
+    str: (...args) =>
+      new types_1.OwlString(
         args.map(el => printer_1.prStr(el, false)).join(''),
-      );
-    },
-    println(...args) {
+      ),
+    println: (...args) => {
       console.log(args.map(el => printer_1.prStr(el, false)).join(' '));
       return new types_1.OwlNil();
     },
+    add: (...args) =>
+      args.reduce(
+        (a, b) => new types_1.OwlNumber(a.val + b.val),
+        new types_1.OwlNumber(0),
+      ),
   };
   const map = new Map();
   Object.keys(funcs).map(key =>

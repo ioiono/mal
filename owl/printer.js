@@ -13,10 +13,15 @@ exports.prStr = (val, printReadably = true) => {
     case 3 /* Number */:
       return `${val.val}`;
     case 4 /* String */:
-      return `"${val.val
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n')}"`;
+      if (printReadably) {
+        const str = val.val
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n');
+        return `"${str}"`;
+      } else {
+        return val.val;
+      }
     case 5 /* Boolean */:
       return `${val.val}`;
     case 6 /* Nil */:

@@ -5,7 +5,6 @@ exports.isListOrVector = arg =>
 exports.equals = (a, b) => {
   // same object
   if (a === b) return true;
-  if (a.type !== b.type) return false;
   // Nil
   if (a.type === 6 /* Nil */ && b.type === 6 /* Nil */) {
     return true;
@@ -22,6 +21,7 @@ exports.equals = (a, b) => {
     }
     return true;
   }
+  if (a.type !== b.type) return false;
   // Map
   if (a.type === 9 /* HashMap */ && b.type === 9 /* HashMap */) {
     if (a.map.size !== b.map.size) {

@@ -28,12 +28,12 @@ export const isListOrVector = (arg: OwlType): arg is OwlList | OwlVector =>
 export const equals = (a: OwlType, b: OwlType): boolean => {
   // same object
   if (a === b) return true;
-  if (a.type !== b.type) return false;
 
   // Nil
   if (a.type === Types.Nil && b.type === Types.Nil) {
     return true;
   }
+
   // List and Vector
   if (isListOrVector(a) && isListOrVector(b)) {
     if (a.list.length !== b.list.length) {
@@ -46,6 +46,9 @@ export const equals = (a: OwlType, b: OwlType): boolean => {
     }
     return true;
   }
+
+  if (a.type !== b.type) return false;
+
   // Map
   if (a.type === Types.HashMap && b.type === Types.HashMap) {
     if (a.map.size !== b.map.size) {
