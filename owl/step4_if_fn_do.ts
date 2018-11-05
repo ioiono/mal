@@ -117,7 +117,7 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
             return el;
           });
 
-          return new OwlFunction((...fnArgs: OwlType[]) =>
+          return OwlFunction.simpleFunc((...fnArgs: OwlType[]) =>
             EVAL(binds, new Env(env, symbols, fnArgs)),
           );
         }

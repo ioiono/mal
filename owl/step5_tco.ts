@@ -21,7 +21,7 @@ const READ = (str: string): OwlType => {
 
 // EVAL
 const EVAL = (ast: OwlType, env: Env): OwlType => {
-  while (true) {
+  loop: while (true) {
     if (!ast) throw new Error('invalid syntax');
     if (ast.type !== Types.List) {
       return evalAST(ast, env);
@@ -77,17 +77,13 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
             env = letEnv;
             // noinspection TsLint
             ast = ast.list[2];
-            break; // continue to loop
+            continue loop; // continue to loop
           }
           case 'do': {
-            const [, ...list] = ast.list;
-            const r = evalAST(new OwlList(list), env);
-            if (r.type !== Types.List && r.type !== Types.Vector) {
-              throw new Error(
-                `unexpected return type: ${r.type}, expected: list or vector`,
-              );
-            }
-            return r.list[r.list.length - 1];
+            const list = ast.list.slice(1, -1);
+            evalAST(new OwlList(list), env);
+            ast = ast.list[ast.list.length - 1];
+            continue loop;
           }
           case 'if': {
             const [, fir, sec, thr] = ast.list;
@@ -98,16 +94,16 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
                 r.type === Types.Nil
               )
             ) {
-              return EVAL(sec, env);
+              ast = sec;
             } else if (thr) {
-              return EVAL(thr, env);
+              ast = thr;
             } else {
-              return new OwlNil();
+              ast = new OwlNil();
             }
+            continue loop;
           }
           case 'fn*': {
-            const [, sec, binds] = ast.list;
-
+            const [, sec, fnBody] = ast.list;
             if (!isListOrVector(sec)) {
               throw new Error(
                 `unexpected return type: ${sec.type}, expected: list or vector`,
@@ -123,9 +119,7 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
               return el;
             });
 
-            return new OwlFunction((...fnArgs: OwlType[]) =>
-              EVAL(binds, new Env(env, symbols, fnArgs)),
-            );
+            return OwlFunction.fromLisp(EVAL, env, symbols, fnBody);
           }
         }
     }
@@ -133,6 +127,11 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
     const [fn, ...args] = res.list;
     if (fn.type !== Types.Function) {
       throw new Error(`unexpected token: ${fn.type}, expected: function`);
+    }
+    if (fn.ast) {
+      ast = fn.ast;
+      env = fn.newEnv(args);
+      continue loop;
     }
     return fn.func(...args);
   }

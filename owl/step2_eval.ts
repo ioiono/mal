@@ -76,16 +76,16 @@ const evalAST = (ast: OwlType, env: OwlEnvironment): OwlType => {
 const PRINT = prStr;
 // noinspection TsLint
 const replEnv: OwlEnvironment = {
-  '+': new OwlFunction(
+  '+': OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val + b!.val),
   ),
-  '-': new OwlFunction(
+  '-': OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val - b!.val),
   ),
-  '*': new OwlFunction(
+  '*': OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val * b!.val),
   ),
-  '/': new OwlFunction(
+  '/': OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val / b!.val),
   ),
 };

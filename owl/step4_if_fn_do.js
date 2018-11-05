@@ -111,7 +111,7 @@ const EVAL = (ast, env) => {
             }
             return el;
           });
-          return new types_1.OwlFunction((...fnArgs) =>
+          return types_1.OwlFunction.simpleFunc((...fnArgs) =>
             EVAL(binds, new env_1.Env(env, symbols, fnArgs)),
           );
         }

@@ -106,19 +106,27 @@ const PRINT = printer_1.prStr;
 const replEnv = new env_1.Env();
 replEnv.set(
   new types_1.OwlSymbol('+'),
-  new types_1.OwlFunction((a, b) => new types_1.OwlNumber(a.val + b.val)),
+  types_1.OwlFunction.simpleFunc(
+    (a, b) => new types_1.OwlNumber(a.val + b.val),
+  ),
 );
 replEnv.set(
   new types_1.OwlSymbol('-'),
-  new types_1.OwlFunction((a, b) => new types_1.OwlNumber(a.val - b.val)),
+  types_1.OwlFunction.simpleFunc(
+    (a, b) => new types_1.OwlNumber(a.val - b.val),
+  ),
 );
 replEnv.set(
   new types_1.OwlSymbol('*'),
-  new types_1.OwlFunction((a, b) => new types_1.OwlNumber(a.val * b.val)),
+  types_1.OwlFunction.simpleFunc(
+    (a, b) => new types_1.OwlNumber(a.val * b.val),
+  ),
 );
 replEnv.set(
   new types_1.OwlSymbol('/'),
-  new types_1.OwlFunction((a, b) => new types_1.OwlNumber(a.val / b.val)),
+  types_1.OwlFunction.simpleFunc(
+    (a, b) => new types_1.OwlNumber(a.val / b.val),
+  ),
 );
 const rep = str => PRINT(EVAL(READ(str), replEnv));
 while (true) {

@@ -1,3 +1,5 @@
+import { Env } from './env';
+
 export type OwlType =
   | OwlList
   | OwlVector
@@ -157,15 +159,72 @@ export class OwlHashMap {
     for (let i = 0; i < list.length; i += 2) {
       const k = list[i];
       const v = list[i + 1];
-      if (k.type !== Types.String && k.type !== Types.Keyword)
+      if (k.type !== Types.String && k.type !== Types.Keyword) {
         throw new Error(`expected hash-map key string, got: ${k.type}`);
+      }
       this.map.set(k, v);
     }
   }
 }
 
-export class OwlFunction {
-  public type: Types.Function = Types.Function;
+type OwlFunc = (...args: any[]) => OwlType;
 
-  constructor(public func: (...args: any[]) => OwlType) {}
+export class OwlFunction {
+  public static simpleFunc(func: OwlFunc): OwlFunction {
+    const fn = new OwlFunction();
+    fn.func = func;
+    return fn;
+  }
+
+  public static fromLisp(
+    EVAL: (ast: OwlType, env: Env) => OwlType,
+    env: Env,
+    params: OwlSymbol[],
+    fnBody: OwlType,
+  ): OwlFunction {
+    const f = new OwlFunction();
+    f.func = (...args) =>
+      EVAL(
+        fnBody,
+        new Env(
+          env,
+          params,
+          args.map(x => {
+            if (!x) {
+              throw new Error(`invalid argument`);
+            }
+            return x;
+          }),
+        ),
+      );
+    f.env = env;
+    f.params = params;
+    f.ast = fnBody;
+
+    return f;
+  }
+
+  public type: Types.Function = Types.Function;
+  /**
+   * the original function value
+   */
+  public func: OwlFunc;
+  /**
+   * the body of the function.
+   */
+  public ast: OwlType;
+  /**
+   * the current value of the env parameter of EVAL.
+   */
+  public env: Env;
+  /**
+   * the parameter names of the function.
+   */
+  public params: OwlSymbol[];
+
+  private constructor() {}
+
+  newEnv(args: OwlType[]) {
+    return new Env(this.env, this.params, args);
+  }
 }

@@ -113,7 +113,10 @@ exports.ns = (() => {
   };
   const map = new Map();
   Object.keys(funcs).map(key =>
-    map.set(new types_1.OwlSymbol(key), new types_1.OwlFunction(funcs[key])),
+    map.set(
+      new types_1.OwlSymbol(key),
+      types_1.OwlFunction.simpleFunc(funcs[key]),
+    ),
   );
   return map;
 })();

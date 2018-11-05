@@ -118,7 +118,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
   };
   const map = new Map<OwlSymbol, OwlFunction>();
   Object.keys(funcs).map(key =>
-    map.set(new OwlSymbol(key), new OwlFunction(funcs[key])),
+    map.set(new OwlSymbol(key), OwlFunction.simpleFunc(funcs[key])),
   );
   return map;
 })();

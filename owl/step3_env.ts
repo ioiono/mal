@@ -122,25 +122,25 @@ const PRINT = prStr;
 const replEnv = new Env();
 replEnv.set(
   new OwlSymbol('+'),
-  new OwlFunction(
+  OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val + b!.val),
   ),
 );
 replEnv.set(
   new OwlSymbol('-'),
-  new OwlFunction(
+  OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val - b!.val),
   ),
 );
 replEnv.set(
   new OwlSymbol('*'),
-  new OwlFunction(
+  OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val * b!.val),
   ),
 );
 replEnv.set(
   new OwlSymbol('/'),
-  new OwlFunction(
+  OwlFunction.simpleFunc(
     (a?: OwlNumber, b?: OwlNumber) => new OwlNumber(a!.val / b!.val),
   ),
 );

@@ -1,5 +1,6 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
+const env_1 = require('./env');
 exports.isListOrVector = arg =>
   arg.type === 1 /* List */ || arg.type === 2 /* Vector */;
 exports.equals = (a, b) => {
@@ -129,17 +130,46 @@ class OwlHashMap {
     for (let i = 0; i < list.length; i += 2) {
       const k = list[i];
       const v = list[i + 1];
-      if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */)
+      if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */) {
         throw new Error(`expected hash-map key string, got: ${k.type}`);
+      }
       this.map.set(k, v);
     }
   }
 }
 exports.OwlHashMap = OwlHashMap;
 class OwlFunction {
-  constructor(func) {
-    this.func = func;
+  constructor() {
     this.type = 10 /* Function */;
+  }
+  static simpleFunc(func) {
+    const fn = new OwlFunction();
+    fn.func = func;
+    return fn;
+  }
+  static fromLisp(EVAL, env, params, fnBody) {
+    const f = new OwlFunction();
+    f.func = (...args) =>
+      EVAL(
+        fnBody,
+        new env_1.Env(
+          env,
+          params,
+          args.map(x => {
+            if (!x) {
+              throw new Error(`invalid argument`);
+            }
+            return x;
+          }),
+        ),
+      );
+    f.env = env;
+    f.params = params;
+    f.ast = fnBody;
+    return f;
+  }
+  newEnv(args) {
+    return new env_1.Env(this.env, this.params, args);
   }
 }
 exports.OwlFunction = OwlFunction;
