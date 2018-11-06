@@ -38,5 +38,7 @@ export const prStr = (val: OwlType, printReadably: boolean = true): string => {
       return result;
     case Types.Function:
       return '#<function>';
+    case Types.Atom:
+      return `(atom ${prStr(val.val, printReadably)})`;
   }
 };

@@ -7,6 +7,7 @@
     "ffi": "git+https://github.com/node-ffi/node-ffi.git"
   },
   "devDependencies": {
+    "@types/node": "^10.12.2",
     "husky": "^1.1.0",
     "prettier": "^1.14.3",
     "pretty-quick": "^1.7.0",
@@ -21,7 +22,8 @@
     "test:step2": "cd .. && make 'test^owl^step2'",
     "test:step3": "cd .. && make 'test^owl^step3'",
     "test:step4": "cd .. && make 'test^owl^step4'",
-    "test:step5": "cd .. && make 'test^owl^step5'"
+    "test:step5": "cd .. && make 'test^owl^step5'",
+    "test:step6": "cd .. && make 'test^owl^step6'"
   },
   "husky": {
     "hooks": {

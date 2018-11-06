@@ -1,6 +1,19 @@
 'use strict';
+var __importStar =
+  (this && this.__importStar) ||
+  function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null)
+      for (var k in mod)
+        if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result['default'] = mod;
+    return result;
+  };
 Object.defineProperty(exports, '__esModule', { value: true });
+const fs = __importStar(require('fs'));
 const printer_1 = require('./printer');
+const reader_1 = require('./reader');
 const types_1 = require('./types');
 exports.ns = (() => {
   const funcs = {
@@ -110,6 +123,45 @@ exports.ns = (() => {
         (a, b) => new types_1.OwlNumber(a.val + b.val),
         new types_1.OwlNumber(0),
       ),
+    'read-string': str => {
+      if (str.type !== 4 /* String */) {
+        throw new Error(`unexpected symbol: ${str.type}, expected: string`);
+      }
+      return reader_1.readStr(str.val);
+    },
+    slurp: filename => {
+      if (filename.type !== 4 /* String */) {
+        throw new Error(
+          `unexpected symbol: ${filename.type}, expected: string`,
+        );
+      }
+      return new types_1.OwlString(fs.readFileSync(filename.val, 'UTF-8'));
+    },
+    atom: arg => new types_1.OwlAtom(arg),
+    'atom?': arg => new types_1.OwlBoolean(arg.type === 11 /* Atom */),
+    deref: arg => {
+      if (arg.type !== 11 /* Atom */) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: atom`);
+      }
+      return arg.val;
+    },
+    'reset!': (atom, value) => {
+      if (atom.type !== 11 /* Atom */) {
+        throw new Error(`unexpected symbol: ${atom.type}, expected: atom`);
+      }
+      atom.val = value;
+      return atom.val;
+    },
+    'swap!': (atom, func, ...args) => {
+      if (atom.type !== 11 /* Atom */) {
+        throw new Error(`unexpected symbol: ${atom.type}, expected: atom`);
+      }
+      if (func.type !== 10 /* Function */) {
+        throw new Error(`unexpected symbol: ${func.type}, expected: function`);
+      }
+      atom.val = func.func(...[atom.val, ...args]);
+      return atom.val;
+    },
   };
   const map = new Map();
   Object.keys(funcs).map(key =>

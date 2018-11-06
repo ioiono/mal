@@ -173,3 +173,10 @@ class OwlFunction {
   }
 }
 exports.OwlFunction = OwlFunction;
+class OwlAtom {
+  constructor(val) {
+    this.val = val;
+    this.type = 11 /* Atom */;
+  }
+}
+exports.OwlAtom = OwlAtom;

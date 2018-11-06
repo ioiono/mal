@@ -10,7 +10,8 @@ export type OwlType =
   | OwlSymbol
   | OwlKeyword
   | OwlHashMap
-  | OwlFunction;
+  | OwlFunction
+  | OwlAtom;
 
 export const enum Types {
   List = 1,
@@ -23,6 +24,7 @@ export const enum Types {
   Keyword,
   HashMap,
   Function,
+  Atom,
 }
 
 export const isListOrVector = (arg: OwlType): arg is OwlList | OwlVector =>
@@ -223,8 +225,13 @@ export class OwlFunction {
   public params: OwlSymbol[];
 
   private constructor() {}
-
-  newEnv(args: OwlType[]) {
+  public newEnv(args: OwlType[]) {
     return new Env(this.env, this.params, args);
   }
+}
+
+export class OwlAtom {
+  public type: Types.Atom = Types.Atom;
+
+  constructor(public val: OwlType) {}
 }

@@ -45,5 +45,7 @@ exports.prStr = (val, printReadably = true) => {
       return result;
     case 10 /* Function */:
       return '#<function>';
+    case 11 /* Atom */:
+      return `(atom ${exports.prStr(val.val, printReadably)})`;
   }
 };
