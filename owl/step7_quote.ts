@@ -23,6 +23,7 @@ const READ = (str: string): OwlType => {
 
 const isPair = (ast: OwlType): ast is OwlList | OwlVector =>
   isListOrVector(ast) && ast.list.length > 0;
+
 const quasiquote = (ast: OwlType): OwlType => {
   if (!isPair(ast)) {
     return new OwlList([new OwlSymbol('quote'), ast]);
@@ -107,20 +108,20 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
             env = letEnv;
             // noinspection TsLint
             ast = ast.list[2];
-            continue loop; // continue to loop
+            continue; // continue to loop
           }
           case 'quote': {
             return ast.list[1];
           }
           case 'quasiquote': {
             ast = quasiquote(ast.list[1]);
-            continue loop;
+            continue;
           }
           case 'do': {
             const list = ast.list.slice(1, -1);
             evalAST(new OwlList(list), env);
             ast = ast.list[ast.list.length - 1];
-            continue loop;
+            continue;
           }
           case 'if': {
             const [, fir, sec, thr] = ast.list;
@@ -137,7 +138,7 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
             } else {
               ast = new OwlNil();
             }
-            continue loop;
+            continue;
           }
           case 'fn*': {
             const [, sec, fnBody] = ast.list;
@@ -168,7 +169,7 @@ const EVAL = (ast: OwlType, env: Env): OwlType => {
     if (fn.ast) {
       ast = fn.ast;
       env = fn.newEnv(args);
-      continue loop;
+      continue;
     }
     return fn.func(...args);
   }

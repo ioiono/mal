@@ -102,20 +102,20 @@ const EVAL = (ast, env) => {
             env = letEnv;
             // noinspection TsLint
             ast = ast.list[2];
-            continue loop; // continue to loop
+            continue; // continue to loop
           }
           case 'quote': {
             return ast.list[1];
           }
           case 'quasiquote': {
             ast = quasiquote(ast.list[1]);
-            continue loop;
+            continue;
           }
           case 'do': {
             const list = ast.list.slice(1, -1);
             evalAST(new types_1.OwlList(list), env);
             ast = ast.list[ast.list.length - 1];
-            continue loop;
+            continue;
           }
           case 'if': {
             const [, fir, sec, thr] = ast.list;
@@ -132,7 +132,7 @@ const EVAL = (ast, env) => {
             } else {
               ast = new types_1.OwlNil();
             }
-            continue loop;
+            continue;
           }
           case 'fn*': {
             const [, sec, fnBody] = ast.list;
@@ -161,7 +161,7 @@ const EVAL = (ast, env) => {
     if (fn.ast) {
       ast = fn.ast;
       env = fn.newEnv(args);
-      continue loop;
+      continue;
     }
     return fn.func(...args);
   }
