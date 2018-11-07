@@ -13,7 +13,6 @@ import {
   OwlString,
   OwlSymbol,
   OwlType,
-  OwlVector,
   Types,
 } from './types';
 
@@ -180,6 +179,45 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       return new OwlList(
         lists.reduce((a, b) => a.concat(b.list), [] as OwlType[]),
       );
+    },
+    nth: (list: OwlType, idx: OwlNumber): OwlType => {
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      if (idx.type !== Types.Number) {
+        throw new Error(`unexpected symbol: ${idx.type}, expected: number`);
+      }
+      const v = idx.val;
+      if (v < 0 || v >= list.list.length) {
+        throw new Error(`${v}:index out of range`);
+      }
+      return list.list[v];
+    },
+    first: (list: OwlType): OwlType => {
+      if (list.type === Types.Nil) {
+        return new OwlNil();
+      }
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      // maybe []
+      return list.list[0] || new OwlNil();
+    },
+    rest: (list: OwlType): OwlType => {
+      if (list.type === Types.Nil) {
+        return new OwlList([]);
+      }
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      const [first, ...rest] = list.list;
+      return new OwlList(rest);
     },
   };
   const map = new Map<OwlSymbol, OwlFunction>();

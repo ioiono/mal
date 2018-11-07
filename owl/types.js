@@ -145,11 +145,12 @@ class OwlFunction {
   static simpleFunc(func) {
     const fn = new OwlFunction();
     fn.func = func;
+    fn.isMacro = false;
     return fn;
   }
   static fromLisp(EVAL, env, params, fnBody) {
-    const f = new OwlFunction();
-    f.func = (...args) =>
+    const fn = new OwlFunction();
+    fn.func = (...args) =>
       EVAL(
         fnBody,
         new env_1.Env(
@@ -163,10 +164,11 @@ class OwlFunction {
           }),
         ),
       );
-    f.env = env;
-    f.params = params;
-    f.ast = fnBody;
-    return f;
+    fn.env = env;
+    fn.params = params;
+    fn.ast = fnBody;
+    fn.isMacro = false;
+    return fn;
   }
   newEnv(args) {
     return new env_1.Env(this.env, this.params, args);

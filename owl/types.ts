@@ -175,6 +175,8 @@ export class OwlFunction {
   public static simpleFunc(func: OwlFunc): OwlFunction {
     const fn = new OwlFunction();
     fn.func = func;
+    fn.isMacro = false;
+
     return fn;
   }
 
@@ -184,8 +186,8 @@ export class OwlFunction {
     params: OwlSymbol[],
     fnBody: OwlType,
   ): OwlFunction {
-    const f = new OwlFunction();
-    f.func = (...args) =>
+    const fn = new OwlFunction();
+    fn.func = (...args) =>
       EVAL(
         fnBody,
         new Env(
@@ -199,11 +201,12 @@ export class OwlFunction {
           }),
         ),
       );
-    f.env = env;
-    f.params = params;
-    f.ast = fnBody;
+    fn.env = env;
+    fn.params = params;
+    fn.ast = fnBody;
+    fn.isMacro = false;
 
-    return f;
+    return fn;
   }
 
   public type: Types.Function = Types.Function;
@@ -223,6 +226,7 @@ export class OwlFunction {
    * the parameter names of the function.
    */
   public params: OwlSymbol[];
+  public isMacro: boolean;
 
   private constructor() {}
   public newEnv(args: OwlType[]) {

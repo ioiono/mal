@@ -182,6 +182,45 @@ exports.ns = (() => {
       });
       return new types_1.OwlList(lists.reduce((a, b) => a.concat(b.list), []));
     },
+    nth: (list, idx) => {
+      if (!types_1.isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      if (idx.type !== 3 /* Number */) {
+        throw new Error(`unexpected symbol: ${idx.type}, expected: number`);
+      }
+      const v = idx.val;
+      if (v < 0 || v >= list.list.length) {
+        throw new Error(`${v}:index out of range`);
+      }
+      return list.list[v];
+    },
+    first: list => {
+      if (list.type === 6 /* Nil */) {
+        return new types_1.OwlNil();
+      }
+      if (!types_1.isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      // maybe []
+      return list.list[0] || new types_1.OwlNil();
+    },
+    rest: list => {
+      if (list.type === 6 /* Nil */) {
+        return new types_1.OwlList([]);
+      }
+      if (!types_1.isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      const [first, ...rest] = list.list;
+      return new types_1.OwlList(rest);
+    },
   };
   const map = new Map();
   Object.keys(funcs).map(key =>
