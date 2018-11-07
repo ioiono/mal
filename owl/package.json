@@ -23,7 +23,8 @@
     "test:step3": "cd .. && make 'test^owl^step3'",
     "test:step4": "cd .. && make 'test^owl^step4'",
     "test:step5": "cd .. && make 'test^owl^step5'",
-    "test:step6": "cd .. && make 'test^owl^step6'"
+    "test:step6": "cd .. && make 'test^owl^step6'",
+    "test:step7": "cd .. && make 'test^owl^step7'"
   },
   "husky": {
     "hooks": {

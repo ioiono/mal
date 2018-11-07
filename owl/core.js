@@ -35,6 +35,7 @@ exports.ns = (() => {
       }
       return new types_1.OwlNumber(a.val - b.val);
     },
+    // tslint:disable-next-line:object-literal-sort-keys
     '*': (a, b) => {
       if (a.type !== 3 /* Number */) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
@@ -161,6 +162,25 @@ exports.ns = (() => {
       }
       atom.val = func.func(...[atom.val, ...args]);
       return atom.val;
+    },
+    cons: (arg, list) => {
+      if (!types_1.isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      return new types_1.OwlList([arg, ...list.list]);
+    },
+    concat: (...args) => {
+      const lists = args.map(list => {
+        if (!types_1.isListOrVector(list)) {
+          throw new Error(
+            `unexpected symbol: ${list.type}, expected: list or vector`,
+          );
+        }
+        return list;
+      });
+      return new types_1.OwlList(lists.reduce((a, b) => a.concat(b.list), []));
     },
   };
   const map = new Map();

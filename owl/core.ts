@@ -13,6 +13,7 @@ import {
   OwlString,
   OwlSymbol,
   OwlType,
+  OwlVector,
   Types,
 } from './types';
 
@@ -36,6 +37,7 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       return new OwlNumber(a.val - b.val);
     },
+    // tslint:disable-next-line:object-literal-sort-keys
     '*': (a: OwlType, b: OwlType): OwlNumber => {
       if (a.type !== Types.Number) {
         throw new Error(`unexpected symbol: ${a.type}, expected: number`);
@@ -157,6 +159,27 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       }
       atom.val = func.func(...[atom.val, ...args]);
       return atom.val;
+    },
+    cons: (arg: OwlType, list: OwlType): OwlList => {
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      return new OwlList([arg, ...list.list]);
+    },
+    concat: (...args: OwlType[]): OwlList => {
+      const lists = args.map(list => {
+        if (!isListOrVector(list)) {
+          throw new Error(
+            `unexpected symbol: ${list.type}, expected: list or vector`,
+          );
+        }
+        return list;
+      });
+      return new OwlList(
+        lists.reduce((a, b) => a.concat(b.list), [] as OwlType[]),
+      );
     },
   };
   const map = new Map<OwlSymbol, OwlFunction>();
