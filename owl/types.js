@@ -1,6 +1,7 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
 const env_1 = require('./env');
+exports.isOwlType = arg => !!arg.type;
 exports.isListOrVector = arg =>
   arg.type === 1 /* List */ || arg.type === 2 /* Vector */;
 exports.equals = (a, b) => {
@@ -41,6 +42,7 @@ exports.equals = (a, b) => {
       if (bV === undefined) return false;
       if (!exports.equals(v, bV)) return false;
     }
+    return true;
   }
   //  Symbol
   if (a.type === 7 /* Symbol */ && b.type === 7 /* Symbol */) {
@@ -131,10 +133,44 @@ class OwlHashMap {
       const k = list[i];
       const v = list[i + 1];
       if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */) {
-        throw new Error(`expected hash-map key string, got: ${k.type}`);
+        throw new Error(
+          `unexpected symbol: ${k.type}, expected: string or keyword`,
+        );
       }
       this.map.set(k, v);
     }
+  }
+  assoc(args) {
+    const list = [];
+    this.map.forEach((v, k) => {
+      list.push(k);
+      list.push(v);
+    });
+    return new OwlHashMap([...list, ...args]);
+  }
+  dissoc(args) {
+    const list = [];
+    this.map.forEach((v, k) => {
+      if (~args.indexOf(k)) {
+        list.push(k);
+        list.push(v);
+      }
+    });
+    return new OwlHashMap(list);
+  }
+  get(key) {
+    console.log(this.map);
+    console.log(key);
+    return this.map.get(key) || new OwlNil();
+  }
+  contains(key) {
+    return this.map.has(key);
+  }
+  keys() {
+    return new OwlList([...this.map.keys()]);
+  }
+  vals() {
+    return new OwlList([...this.map.values()]);
   }
 }
 exports.OwlHashMap = OwlHashMap;

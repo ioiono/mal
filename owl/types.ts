@@ -27,6 +27,8 @@ export const enum Types {
   Atom,
 }
 
+export const isOwlType = (arg: any): arg is OwlType => !!arg.type;
+
 export const isListOrVector = (arg: OwlType): arg is OwlList | OwlVector =>
   arg.type === Types.List || arg.type === Types.Vector;
 export const equals = (a: OwlType, b: OwlType): boolean => {
@@ -73,6 +75,7 @@ export const equals = (a: OwlType, b: OwlType): boolean => {
 
       if (!equals(v, bV)) return false;
     }
+    return true;
   }
 
   //  Symbol
@@ -162,10 +165,51 @@ export class OwlHashMap {
       const k = list[i];
       const v = list[i + 1];
       if (k.type !== Types.String && k.type !== Types.Keyword) {
-        throw new Error(`expected hash-map key string, got: ${k.type}`);
+        throw new Error(
+          `unexpected symbol: ${k.type}, expected: string or keyword`,
+        );
       }
       this.map.set(k, v);
     }
+  }
+
+  public assoc(args: OwlType[]): OwlHashMap {
+    const list: OwlType[] = [];
+    this.map.forEach((v, k) => {
+      list.push(k);
+      list.push(v);
+    });
+    return new OwlHashMap([...list, ...args]);
+  }
+
+  public dissoc(args: OwlType[]): OwlHashMap {
+    const list: OwlType[] = [];
+    this.map.forEach((v, k) => {
+      if (~args.indexOf(k)) {
+        list.push(k);
+        list.push(v);
+      }
+    });
+
+    return new OwlHashMap(list);
+  }
+
+  public get(key: OwlType): OwlType {
+    console.log(this.map);
+    console.log(key);
+    return this.map.get(key) || new OwlNil();
+  }
+
+  public contains(key: OwlType): boolean {
+    return this.map.has(key);
+  }
+
+  public keys(): OwlList {
+    return new OwlList([...this.map.keys()]);
+  }
+
+  public vals(): OwlList {
+    return new OwlList([...this.map.values()]);
   }
 }
 
@@ -229,6 +273,7 @@ export class OwlFunction {
   public isMacro: boolean;
 
   private constructor() {}
+
   public newEnv(args: OwlType[]) {
     return new Env(this.env, this.params, args);
   }

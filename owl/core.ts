@@ -7,12 +7,15 @@ import {
   OwlAtom,
   OwlBoolean,
   OwlFunction,
+  OwlHashMap,
+  OwlKeyword,
   OwlList,
   OwlNil,
   OwlNumber,
   OwlString,
   OwlSymbol,
   OwlType,
+  OwlVector,
   Types,
 } from './types';
 
@@ -219,6 +222,111 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       const [first, ...rest] = list.list;
       return new OwlList(rest);
     },
+    throw: (arg: OwlType): OwlType => {
+      throw arg;
+    },
+    apply: (fn: OwlType, ...args: OwlType[]): OwlType => {
+      if (fn.type !== Types.Function) {
+        throw new Error(`unexpected symbol: ${fn.type}, expected: function`);
+      }
+      const list = args[args.length - 1];
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      const res = [...args.slice(0, -1), ...list.list];
+      return fn.func(...res);
+    },
+    map: (fn: OwlType, ...args: OwlType[]): OwlList => {
+      if (fn.type !== Types.Function) {
+        throw new Error(`unexpected symbol: ${fn.type}, expected: function`);
+      }
+      return new OwlList(args.map(fn.func));
+    },
+    'nil?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Nil),
+    'true?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Boolean && arg.val),
+    'false?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Boolean && !arg.val),
+    'symbol?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Symbol),
+    symbol: (arg: OwlType): OwlSymbol => {
+      if (arg.type !== Types.String) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      return new OwlSymbol(arg.val);
+    },
+    keyword: (arg: OwlType): OwlKeyword => {
+      if (arg.type === Types.Keyword) {
+        return arg;
+      }
+      if (arg.type !== Types.String) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      return new OwlKeyword(arg.val);
+    },
+    'keyword?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Keyword),
+    vector: (...args: OwlType[]): OwlVector => new OwlVector(args),
+    'vector?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Vector),
+    'hash-map': (...args: OwlType[]): OwlHashMap => new OwlHashMap(args),
+    'map?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.HashMap),
+    assoc: (m: OwlType, ...args: OwlType[]): OwlHashMap => {
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.assoc(args);
+    },
+
+    dissoc: (m: OwlType, ...args: OwlType[]) => {
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.dissoc(args);
+    },
+    get: (m: OwlType, key: OwlType): OwlType => {
+      if (m.type === Types.Nil) {
+        return new OwlNil();
+      }
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      if (key.type !== Types.String && key.type !== Types.Keyword) {
+        throw new Error(
+          `unexpected symbol: ${key.type}, expected: string or keyword`,
+        );
+      }
+      return m.get(key);
+    },
+    'contains?': (m: OwlType, key: OwlType): OwlBoolean => {
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      if (key.type !== Types.String && key.type !== Types.Keyword) {
+        throw new Error(
+          `unexpected symbol: ${key.type}, expected: string or keyword`,
+        );
+      }
+      return new OwlBoolean(m.contains(key));
+    },
+    keys: (m: OwlType): OwlList => {
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.keys();
+    },
+    vals: (m: OwlType): OwlList => {
+      if (m.type !== Types.HashMap) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.vals();
+    },
+    'sequential?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(isListOrVector(arg)),
   };
   const map = new Map<OwlSymbol, OwlFunction>();
   Object.keys(funcs).map(key =>

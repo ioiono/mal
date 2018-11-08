@@ -20,7 +20,8 @@
     "no-console": {
       "severity": "warning",
       "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
-    }
+    },
+    "no-bitwise": false
   },
   "rulesDirectory": []
 }

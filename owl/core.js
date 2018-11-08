@@ -221,6 +221,104 @@ exports.ns = (() => {
       const [first, ...rest] = list.list;
       return new types_1.OwlList(rest);
     },
+    throw: arg => {
+      throw arg;
+    },
+    apply: (fn, ...args) => {
+      if (fn.type !== 10 /* Function */) {
+        throw new Error(`unexpected symbol: ${fn.type}, expected: function`);
+      }
+      const list = args[args.length - 1];
+      if (!types_1.isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      const res = [...args.slice(0, -1), ...list.list];
+      return fn.func(...res);
+    },
+    map: (fn, ...args) => {
+      if (fn.type !== 10 /* Function */) {
+        throw new Error(`unexpected symbol: ${fn.type}, expected: function`);
+      }
+      return new types_1.OwlList(args.map(fn.func));
+    },
+    'nil?': arg => new types_1.OwlBoolean(arg.type === 6 /* Nil */),
+    'true?': arg =>
+      new types_1.OwlBoolean(arg.type === 5 /* Boolean */ && arg.val),
+    'false?': arg =>
+      new types_1.OwlBoolean(arg.type === 5 /* Boolean */ && !arg.val),
+    'symbol?': arg => new types_1.OwlBoolean(arg.type === 7 /* Symbol */),
+    symbol: arg => {
+      if (arg.type !== 4 /* String */) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      return new types_1.OwlSymbol(arg.val);
+    },
+    keyword: arg => {
+      if (arg.type === 8 /* Keyword */) {
+        return arg;
+      }
+      if (arg.type !== 4 /* String */) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      return new types_1.OwlKeyword(arg.val);
+    },
+    'keyword?': arg => new types_1.OwlBoolean(arg.type === 8 /* Keyword */),
+    vector: (...args) => new types_1.OwlVector(args),
+    'vector?': arg => new types_1.OwlBoolean(arg.type === 2 /* Vector */),
+    'hash-map': (...args) => new types_1.OwlHashMap(args),
+    'map?': arg => new types_1.OwlBoolean(arg.type === 9 /* HashMap */),
+    assoc: (m, ...args) => {
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.assoc(args);
+    },
+    dissoc: (m, ...args) => {
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.dissoc(args);
+    },
+    get: (m, key) => {
+      if (m.type === 6 /* Nil */) {
+        return new types_1.OwlNil();
+      }
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      if (key.type !== 4 /* String */ && key.type !== 8 /* Keyword */) {
+        throw new Error(
+          `unexpected symbol: ${key.type}, expected: string or keyword`,
+        );
+      }
+      return m.get(key);
+    },
+    'contains?': (m, key) => {
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      if (key.type !== 4 /* String */ && key.type !== 8 /* Keyword */) {
+        throw new Error(
+          `unexpected symbol: ${key.type}, expected: string or keyword`,
+        );
+      }
+      return new types_1.OwlBoolean(m.contains(key));
+    },
+    keys: m => {
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.keys();
+    },
+    vals: m => {
+      if (m.type !== 9 /* HashMap */) {
+        throw new Error(`unexpected symbol: ${m.type}, expected: hash-map`);
+      }
+      return m.vals();
+    },
+    'sequential?': arg => new types_1.OwlBoolean(types_1.isListOrVector(arg)),
   };
   const map = new Map();
   Object.keys(funcs).map(key =>
