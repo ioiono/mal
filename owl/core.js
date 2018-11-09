@@ -14,6 +14,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const fs = __importStar(require('fs'));
 const printer_1 = require('./printer');
 const reader_1 = require('./reader');
+const node_readline_1 = require('./node_readline');
 const types_1 = require('./types');
 exports.ns = (() => {
   const funcs = {
@@ -324,6 +325,55 @@ exports.ns = (() => {
       return m.vals();
     },
     'sequential?': arg => new types_1.OwlBoolean(types_1.isListOrVector(arg)),
+    readline: arg => {
+      if (arg.type !== 4 /* String */) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      const ret = node_readline_1.readline(arg.val);
+      if (ret == null) {
+        return new types_1.OwlNil();
+      } else return new types_1.OwlString(ret);
+    },
+    meta: arg => arg.meta || new types_1.OwlNil(),
+    'with-meta': (arg, meta) => arg.withMeta(meta),
+    'time-ms': () => new types_1.OwlNumber(Date.now()),
+    'string?': arg => new types_1.OwlBoolean(arg.type === 4 /* String */),
+    'number?': arg => new types_1.OwlBoolean(arg.type === 3 /* Number */),
+    'fn?': arg =>
+      new types_1.OwlBoolean(arg.type === 10 /* Function */ && !arg.isMacro),
+    'macro?': arg =>
+      new types_1.OwlBoolean(arg.type === 10 /* Function */ && arg.isMacro),
+    seq: arg => {
+      if (arg.type === 1 /* List */) {
+        return arg.list.length === 0 ? new types_1.OwlNil() : arg;
+      } else if (arg.type === 2 /* Vector */) {
+        return arg.list.length === 0
+          ? new types_1.OwlNil()
+          : new types_1.OwlList(arg.list);
+      } else if (arg.type === 4 /* String */) {
+        return arg.val === ''
+          ? new types_1.OwlNil()
+          : new types_1.OwlList(
+              arg.val.split('').map(str => new types_1.OwlString(str)),
+            );
+      } else if (arg.type === 6 /* Nil */) {
+        return new types_1.OwlNil();
+      } else {
+        throw new Error(
+          `unexpected symbol: ${arg.type}, expected: list or vector or string`,
+        );
+      }
+    },
+    conj: (list, ...args) => {
+      if (list.type === 1 /* List */) {
+        return new types_1.OwlList([...args.reverse(), ...list.list]);
+      } else if (list.type === 2 /* Vector */) {
+        return new types_1.OwlVector([...list.list, ...args]);
+      }
+      throw new Error(
+        `unexpected symbol: ${list.type}, expected: list or vector`,
+      );
+    },
   };
   const map = new Map();
   Object.keys(funcs).map(key =>

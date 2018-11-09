@@ -96,60 +96,111 @@ export const equals = (a: OwlType, b: OwlType): boolean => {
 
 export class OwlList {
   public type: Types.List = Types.List;
+  public meta?: OwlType;
 
   constructor(public list: OwlType[]) {}
+
+  public withMeta(meta: OwlType) {
+    const val = new OwlList(this.list);
+    val.meta = meta;
+    return val;
+  }
 }
 
 export class OwlVector {
   public type: Types.Vector = Types.Vector;
+  public meta?: OwlType;
 
   constructor(public list: OwlType[]) {}
+
+  public withMeta(meta: OwlType) {
+    const val = new OwlVector(this.list);
+    val.meta = meta;
+    return val;
+  }
 }
 
 export class OwlNumber {
   public type: Types.Number = Types.Number;
+  public meta?: OwlType;
 
   constructor(public val: number) {}
+
+  public withMeta(meta: OwlType) {
+    const num = new OwlNumber(this.val);
+    num.meta = meta;
+    return num;
+  }
 }
 
 export class OwlString {
   public type: Types.String = Types.String;
+  public meta?: OwlType;
 
   constructor(public val: string) {}
+
+  public withMeta(meta: OwlType) {
+    const val = new OwlString(this.val);
+    val.meta = meta;
+    return val;
+  }
 }
 
 export class OwlBoolean {
   public type: Types.Boolean = Types.Boolean;
+  public meta?: OwlType;
 
   constructor(public val: boolean) {}
+
+  public withMeta(meta: OwlType) {
+    const val = new OwlBoolean(this.val);
+    val.meta = meta;
+    return val;
+  }
 }
 
 export class OwlNil {
   public type: Types.Nil = Types.Nil;
+  public meta?: OwlType;
+
+  public withMeta(_meta: OwlType): OwlNil {
+    throw new Error(`not supported`);
+  }
 }
 
 export class OwlSymbol {
   public type: Types.Symbol = Types.Symbol;
   public val: symbol;
+  public meta?: OwlType;
 
   constructor(val: string) {
     // The Symbol.for(key) method searches for existing symbols in a runtime-wide symbol registry with the given key
     // and returns it if found. Otherwise a new symbol gets created in the global symbol registry with this key.
     this.val = Symbol.for(val);
   }
+
+  public withMeta(_meta: OwlType): OwlSymbol {
+    throw new Error(`not supported`);
+  }
 }
 
 export class OwlKeyword {
   public type: Types.Keyword = Types.Keyword;
+  public meta?: OwlType;
 
   constructor(public val: string) {
     this.val = String.fromCharCode(0x29e) + this.val;
+  }
+
+  public withMeta(_meta: OwlType): OwlSymbol {
+    throw new Error(`not supported`);
   }
 }
 
 export class OwlHashMap {
   public type: Types.HashMap = Types.HashMap;
   public map = new Map<string, OwlType>();
+  public meta?: OwlType;
 
   constructor(public list: OwlType[]) {
     if (list.length % 2 !== 0) {
@@ -226,6 +277,12 @@ export class OwlHashMap {
     });
     return list;
   }
+
+  public withMeta(meta: OwlType) {
+    const map = this.assoc([]);
+    map.meta = meta;
+    return map;
+  }
 }
 
 type OwlFunc = (...args: any[]) => OwlType;
@@ -286,16 +343,37 @@ export class OwlFunction {
    */
   public params: OwlSymbol[];
   public isMacro: boolean;
+  public meta?: OwlType;
 
   private constructor() {}
 
-  public newEnv(args: OwlType[]) {
+  public newEnv(args: OwlType[]): Env {
     return new Env(this.env, this.params, args);
+  }
+
+  public withMeta(meta: OwlType) {
+    const fn = new OwlFunction();
+    fn.func = this.func;
+    fn.ast = this.ast;
+    fn.env = this.env;
+    fn.params = this.params;
+    fn.isMacro = this.isMacro;
+
+    fn.meta = meta;
+
+    return fn;
   }
 }
 
 export class OwlAtom {
   public type: Types.Atom = Types.Atom;
+  public meta?: OwlType;
 
   constructor(public val: OwlType) {}
+
+  public withMeta(meta: OwlType) {
+    const val = new OwlAtom(this.val);
+    val.meta = meta;
+    return val;
+  }
 }

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { prStr } from './printer';
 import { readStr } from './reader';
+import { readline } from './node_readline';
 import {
   equals,
   isListOrVector,
@@ -332,6 +333,54 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
     },
     'sequential?': (arg: OwlType): OwlBoolean =>
       new OwlBoolean(isListOrVector(arg)),
+    readline: (arg: OwlType): OwlType => {
+      if (arg.type !== Types.String) {
+        throw new Error(`unexpected symbol: ${arg.type}, expected: string`);
+      }
+      const ret = readline(arg.val);
+      if (ret == null) {
+        return new OwlNil();
+      } else return new OwlString(ret);
+    },
+    meta: (arg: OwlType): OwlType => arg.meta || new OwlNil(),
+    'with-meta': (arg: OwlType, meta: OwlType) => arg.withMeta(meta),
+    'time-ms': (): OwlNumber => new OwlNumber(Date.now()),
+    'string?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.String),
+    'number?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Number),
+    'fn?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Function && !arg.isMacro),
+    'macro?': (arg: OwlType): OwlBoolean =>
+      new OwlBoolean(arg.type === Types.Function && arg.isMacro),
+    seq: (arg: OwlType): OwlList | OwlNil => {
+      if (arg.type === Types.List) {
+        return arg.list.length === 0 ? new OwlNil() : arg;
+      } else if (arg.type === Types.Vector) {
+        return arg.list.length === 0 ? new OwlNil() : new OwlList(arg.list);
+      } else if (arg.type === Types.String) {
+        return arg.val === ''
+          ? new OwlNil()
+          : new OwlList(arg.val.split('').map(str => new OwlString(str)));
+      } else if (arg.type === Types.Nil) {
+        return new OwlNil();
+      } else {
+        throw new Error(
+          `unexpected symbol: ${arg.type}, expected: list or vector or string`,
+        );
+      }
+    },
+
+    conj: (list: OwlType, ...args: OwlType[]): OwlList | OwlVector => {
+      if (list.type === Types.List) {
+        return new OwlList([...args.reverse(), ...list.list]);
+      } else if (list.type === Types.Vector) {
+        return new OwlVector([...list.list, ...args]);
+      }
+      throw new Error(
+        `unexpected symbol: ${list.type}, expected: list or vector`,
+      );
+    },
   };
   const map = new Map<OwlSymbol, OwlFunction>();
   Object.keys(funcs).map(key =>

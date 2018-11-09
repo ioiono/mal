@@ -63,12 +63,22 @@ class OwlList {
     this.list = list;
     this.type = 1 /* List */;
   }
+  withMeta(meta) {
+    const val = new OwlList(this.list);
+    val.meta = meta;
+    return val;
+  }
 }
 exports.OwlList = OwlList;
 class OwlVector {
   constructor(list) {
     this.list = list;
     this.type = 2 /* Vector */;
+  }
+  withMeta(meta) {
+    const val = new OwlVector(this.list);
+    val.meta = meta;
+    return val;
   }
 }
 exports.OwlVector = OwlVector;
@@ -77,12 +87,22 @@ class OwlNumber {
     this.val = val;
     this.type = 3 /* Number */;
   }
+  withMeta(meta) {
+    const num = new OwlNumber(this.val);
+    num.meta = meta;
+    return num;
+  }
 }
 exports.OwlNumber = OwlNumber;
 class OwlString {
   constructor(val) {
     this.val = val;
     this.type = 4 /* String */;
+  }
+  withMeta(meta) {
+    const val = new OwlString(this.val);
+    val.meta = meta;
+    return val;
   }
 }
 exports.OwlString = OwlString;
@@ -91,11 +111,19 @@ class OwlBoolean {
     this.val = val;
     this.type = 5 /* Boolean */;
   }
+  withMeta(meta) {
+    const val = new OwlBoolean(this.val);
+    val.meta = meta;
+    return val;
+  }
 }
 exports.OwlBoolean = OwlBoolean;
 class OwlNil {
   constructor() {
     this.type = 6 /* Nil */;
+  }
+  withMeta(_meta) {
+    throw new Error(`not supported`);
   }
 }
 exports.OwlNil = OwlNil;
@@ -106,6 +134,9 @@ class OwlSymbol {
     // and returns it if found. Otherwise a new symbol gets created in the global symbol registry with this key.
     this.val = Symbol.for(val);
   }
+  withMeta(_meta) {
+    throw new Error(`not supported`);
+  }
 }
 exports.OwlSymbol = OwlSymbol;
 class OwlKeyword {
@@ -113,6 +144,9 @@ class OwlKeyword {
     this.val = val;
     this.type = 8 /* Keyword */;
     this.val = String.fromCharCode(0x29e) + this.val;
+  }
+  withMeta(_meta) {
+    throw new Error(`not supported`);
   }
 }
 exports.OwlKeyword = OwlKeyword;
@@ -186,6 +220,11 @@ class OwlHashMap {
     });
     return list;
   }
+  withMeta(meta) {
+    const map = this.assoc([]);
+    map.meta = meta;
+    return map;
+  }
 }
 exports.OwlHashMap = OwlHashMap;
 class OwlFunction {
@@ -223,12 +262,27 @@ class OwlFunction {
   newEnv(args) {
     return new env_1.Env(this.env, this.params, args);
   }
+  withMeta(meta) {
+    const fn = new OwlFunction();
+    fn.func = this.func;
+    fn.ast = this.ast;
+    fn.env = this.env;
+    fn.params = this.params;
+    fn.isMacro = this.isMacro;
+    fn.meta = meta;
+    return fn;
+  }
 }
 exports.OwlFunction = OwlFunction;
 class OwlAtom {
   constructor(val) {
     this.val = val;
     this.type = 11 /* Atom */;
+  }
+  withMeta(meta) {
+    const val = new OwlAtom(this.val);
+    val.meta = meta;
+    return val;
   }
 }
 exports.OwlAtom = OwlAtom;
