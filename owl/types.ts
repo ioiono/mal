@@ -63,14 +63,8 @@ export const equals = (a: OwlType, b: OwlType): boolean => {
     if (Object.keys(a.map).length !== Object.keys(b.map).length) {
       return false;
     }
-    for (const [k, v] of a.map.entries()) {
-      if (k.type !== Types.String && k.type !== Types.Keyword) {
-        throw new Error(
-          `unexpected symbol: ${k.type}, expected: string or keyword`,
-        );
-      }
-
-      const bV = b.map.get(k);
+    for (const [k, v] of a.entries()) {
+      const bV = b.get(k);
       if (bV === undefined) return false;
 
       if (!equals(v, bV)) return false;
@@ -155,7 +149,7 @@ export class OwlKeyword {
 
 export class OwlHashMap {
   public type: Types.HashMap = Types.HashMap;
-  public map = new Map<OwlType, OwlType>();
+  public map = new Map<string, OwlType>();
 
   constructor(public list: OwlType[]) {
     if (list.length % 2 !== 0) {
@@ -169,47 +163,68 @@ export class OwlHashMap {
           `unexpected symbol: ${k.type}, expected: string or keyword`,
         );
       }
-      this.map.set(k, v);
+      this.map.set(k.val, v);
     }
   }
 
   public assoc(args: OwlType[]): OwlHashMap {
     const list: OwlType[] = [];
     this.map.forEach((v, k) => {
-      list.push(k);
+      list.push(new OwlString(k));
       list.push(v);
     });
     return new OwlHashMap([...list, ...args]);
   }
 
   public dissoc(args: OwlType[]): OwlHashMap {
+    const mapCopy = this.assoc([]);
     const list: OwlType[] = [];
-    this.map.forEach((v, k) => {
-      if (~args.indexOf(k)) {
-        list.push(k);
-        list.push(v);
+
+    args.map(arg => {
+      if (arg.type !== Types.String && arg.type !== Types.Keyword) {
+        throw new Error(
+          `unexpected symbol: ${arg.type}, expected: keyword or string`,
+        );
       }
+      mapCopy.map.delete(arg.val);
     });
 
-    return new OwlHashMap(list);
+    return mapCopy;
   }
 
-  public get(key: OwlType): OwlType {
-    console.log(this.map);
-    console.log(key);
-    return this.map.get(key) || new OwlNil();
+  public get(key: OwlKeyword | OwlString): OwlType {
+    return this.map.get(key.val) || new OwlNil();
   }
 
-  public contains(key: OwlType): boolean {
-    return this.map.has(key);
+  public contains(key: OwlKeyword | OwlString): boolean {
+    return this.map.has(key.val);
   }
 
   public keys(): OwlList {
-    return new OwlList([...this.map.keys()]);
+    return new OwlList(
+      [...this.map.keys()].map(
+        k =>
+          k[0] === String.fromCharCode(0x29e)
+            ? new OwlKeyword(k.substr(1))
+            : new OwlString(k),
+      ),
+    );
   }
 
   public vals(): OwlList {
     return new OwlList([...this.map.values()]);
+  }
+
+  public entries(): Array<[OwlString | OwlKeyword, OwlType]> {
+    const list: Array<[OwlString | OwlKeyword, OwlType]> = [];
+    this.map.forEach((v, k) => {
+      const key =
+        k[0] === String.fromCharCode(0x29e)
+          ? new OwlKeyword(k.substr(1))
+          : new OwlString(k);
+      list.push([key, v]);
+    });
+    return list;
   }
 }
 

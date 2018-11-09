@@ -31,13 +31,16 @@ class Env {
   get(key) {
     const env = this.find(key);
     if (!env) {
-      throw new Error(
-        `environment not found for key: "${Symbol.keyFor(key.val)}"`,
-      );
+      // throw new Error(
+      //   `environment not found for key: "${Symbol.keyFor(key.val)}"`,
+      // );
+      throw new Error(`'${Symbol.keyFor(key.val)}' not found`);
     }
     const res = env.data.get(key.val);
-    if (!res)
-      throw new Error(`value not found for key: "${Symbol.keyFor(key.val)}"`);
+    if (!res) {
+      // throw new Error(`value not found for key: "${Symbol.keyFor(key.val)}"`);
+      throw new Error(`'${Symbol.keyFor(key.val)}' not found`);
+    }
     return res;
   }
 }

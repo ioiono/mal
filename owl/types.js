@@ -32,13 +32,8 @@ exports.equals = (a, b) => {
     if (Object.keys(a.map).length !== Object.keys(b.map).length) {
       return false;
     }
-    for (const [k, v] of a.map.entries()) {
-      if (k.type !== 4 /* String */ && k.type !== 8 /* Keyword */) {
-        throw new Error(
-          `unexpected symbol: ${k.type}, expected: string or keyword`,
-        );
-      }
-      const bV = b.map.get(k);
+    for (const [k, v] of a.entries()) {
+      const bV = b.get(k);
       if (bV === undefined) return false;
       if (!exports.equals(v, bV)) return false;
     }
@@ -137,40 +132,59 @@ class OwlHashMap {
           `unexpected symbol: ${k.type}, expected: string or keyword`,
         );
       }
-      this.map.set(k, v);
+      this.map.set(k.val, v);
     }
   }
   assoc(args) {
     const list = [];
     this.map.forEach((v, k) => {
-      list.push(k);
+      list.push(new OwlString(k));
       list.push(v);
     });
     return new OwlHashMap([...list, ...args]);
   }
   dissoc(args) {
+    const mapCopy = this.assoc([]);
     const list = [];
-    this.map.forEach((v, k) => {
-      if (~args.indexOf(k)) {
-        list.push(k);
-        list.push(v);
+    args.map(arg => {
+      if (arg.type !== 4 /* String */ && arg.type !== 8 /* Keyword */) {
+        throw new Error(
+          `unexpected symbol: ${arg.type}, expected: keyword or string`,
+        );
       }
+      mapCopy.map.delete(arg.val);
     });
-    return new OwlHashMap(list);
+    return mapCopy;
   }
   get(key) {
-    console.log(this.map);
-    console.log(key);
-    return this.map.get(key) || new OwlNil();
+    return this.map.get(key.val) || new OwlNil();
   }
   contains(key) {
-    return this.map.has(key);
+    return this.map.has(key.val);
   }
   keys() {
-    return new OwlList([...this.map.keys()]);
+    return new OwlList(
+      [...this.map.keys()].map(
+        k =>
+          k[0] === String.fromCharCode(0x29e)
+            ? new OwlKeyword(k.substr(1))
+            : new OwlString(k),
+      ),
+    );
   }
   vals() {
     return new OwlList([...this.map.values()]);
+  }
+  entries() {
+    const list = [];
+    this.map.forEach((v, k) => {
+      const key =
+        k[0] === String.fromCharCode(0x29e)
+          ? new OwlKeyword(k.substr(1))
+          : new OwlString(k);
+      list.push([key, v]);
+    });
+    return list;
   }
 }
 exports.OwlHashMap = OwlHashMap;

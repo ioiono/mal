@@ -238,11 +238,16 @@ export const ns: Map<OwlSymbol, OwlFunction> = (() => {
       const res = [...args.slice(0, -1), ...list.list];
       return fn.func(...res);
     },
-    map: (fn: OwlType, ...args: OwlType[]): OwlList => {
+    map: (fn: OwlType, list: OwlType): OwlList => {
       if (fn.type !== Types.Function) {
         throw new Error(`unexpected symbol: ${fn.type}, expected: function`);
       }
-      return new OwlList(args.map(fn.func));
+      if (!isListOrVector(list)) {
+        throw new Error(
+          `unexpected symbol: ${list.type}, expected: list or vector`,
+        );
+      }
+      return new OwlList(list.list.map(x => fn.func(x)));
     },
     'nil?': (arg: OwlType): OwlBoolean =>
       new OwlBoolean(arg.type === Types.Nil),

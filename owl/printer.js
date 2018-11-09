@@ -32,7 +32,7 @@ exports.prStr = (val, printReadably = true) => {
       return `:${val.val.substr(1)}`;
     case 9 /* HashMap */:
       let result = '{';
-      for (const [key, value] of val.map) {
+      for (const [key, value] of val.entries()) {
         if (result !== '{') {
           result += ' ';
         }

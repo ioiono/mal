@@ -9,6 +9,7 @@ import {
   OwlHashMap,
   OwlList,
   OwlNil,
+  OwlString,
   OwlType,
   OwlVector,
   Types,
@@ -155,7 +156,7 @@ const evalAST = (ast: OwlType, env: Env): OwlType => {
     case Types.HashMap:
       const list: OwlType[] = [];
       for (const [key, value] of ast.map.entries()) {
-        list.push(key);
+        list.push(new OwlString(key));
         list.push(EVAL(value, env));
       }
       return new OwlHashMap(list);

@@ -92,7 +92,7 @@ const evalAST = (ast, env) => {
     case 9 /* HashMap */:
       const list = [];
       for (const [key, value] of ast.map.entries()) {
-        list.push(key);
+        list.push(new types_1.OwlString(key));
         list.push(EVAL(value, env));
       }
       return new types_1.OwlHashMap(list);

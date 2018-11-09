@@ -1,4 +1,4 @@
-import { OwlType, Types } from './types';
+import { OwlKeyword, OwlString, OwlType, Types } from './types';
 
 export const prStr = (val: OwlType, printReadably: boolean = true): string => {
   switch (val.type) {
@@ -28,7 +28,7 @@ export const prStr = (val: OwlType, printReadably: boolean = true): string => {
       return `:${val.val.substr(1)}`;
     case Types.HashMap:
       let result = '{';
-      for (const [key, value] of val.map) {
+      for (const [key, value] of val.entries()) {
         if (result !== '{') {
           result += ' ';
         }
