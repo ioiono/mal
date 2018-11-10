@@ -222,6 +222,7 @@ function swap_BANG(atm, f) {
 }
 
 function js_eval(str) {
+  console.log("fn->", interop.js_to_mal(eval(str.toString())));
   return interop.js_to_mal(eval(str.toString()));
 }
 

@@ -3,7 +3,7 @@
 ;; Testing Python experesions
 (py* "7")
 ;=>7
-(py* "'7'")
+(py* "print('7')")
 ;=>"7"
 (py* "[7,8,9]")
 ;=>(7 8 9)

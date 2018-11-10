@@ -37,3 +37,5 @@ function js_to_mal(obj) {
 
 exports.resolve_js = interop.resolve_js = resolve_js;
 exports.js_to_mal = interop.js_to_mal = js_to_mal;
+console.log(eval("[1,2,3].map(x => x*2)"));
+console.log("res", js_to_mal(eval("[1,2,3].map(x => x*2)")));
