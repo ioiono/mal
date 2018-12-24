@@ -24,6 +24,7 @@ const READ = (str: string): OwlType => {
 const isMacroCall = (ast: OwlType, env: Env): boolean => {
   if (!isListOrVector(ast)) return false;
   const sym = ast.list[0];
+  if (!sym) return false;
   if (sym.type !== Types.Symbol) return false;
   const e = env.find(sym);
   if (!e) {

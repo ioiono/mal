@@ -24,6 +24,7 @@ const READ = str => {
 const isMacroCall = (ast, env) => {
   if (!types_1.isListOrVector(ast)) return false;
   const sym = ast.list[0];
+  if (!sym) return false;
   if (sym.type !== 7 /* Symbol */) return false;
   const e = env.find(sym);
   if (!e) {
